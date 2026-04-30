@@ -39,6 +39,7 @@
             trbLineWidth = new TrackBar();
             btnOpenFile = new Button();
             btnSaveFile = new Button();
+            saveFileDialog1 = new SaveFileDialog();
             picCanvas = new PictureBox();
             GroupBoxBtn.SuspendLayout();
             GroupBoxColor.SuspendLayout();
@@ -167,6 +168,7 @@
             btnSaveFile.TabIndex = 9;
             btnSaveFile.Text = "저장";
             btnSaveFile.UseVisualStyleBackColor = false;
+            btnSaveFile.Click += btnSave_Click;
             // 
             // picCanvas
             // 
@@ -215,5 +217,6 @@
         private Button btnOpenFile;
         private Button btnSaveFile;
         private PictureBox picCanvas;
+        private SaveFileDialog saveFileDialog1;
     }
 }

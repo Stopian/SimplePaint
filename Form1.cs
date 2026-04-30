@@ -4,6 +4,7 @@ namespace SimplePaint
     using System.Drawing;
     using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
+    using System.IO;
     using System.Windows.Forms;
     public partial class Form1 : Form
     {
@@ -196,6 +197,74 @@ namespace SimplePaint
                 Math.Min(startPoint.Y, endPoint.Y),
                 Math.Abs(startPoint.X - endPoint.X),
                 Math.Abs(startPoint.Y - endPoint.Y));
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (canvasBitmap == null)
+            {
+                MessageBox.Show("저장할 그림이 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 파일 저장 다이얼로그 설정
+            saveFileDialog1.Title = "그림 저장하기";
+            saveFileDialog1.FileName = "MyDrawing";
+            saveFileDialog1.Filter = "PNG 파일(*.png)|*.png|JPG 파일(*.jpg)|*.jpg|BMP 파일(*.bmp)|*.bmp";
+            saveFileDialog1.DefaultExt = "png";
+            saveFileDialog1.AddExtension = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string fileName = saveFileDialog1.FileName;
+                    string ext = Path.GetExtension(fileName).ToLowerInvariant();
+                    if (string.IsNullOrEmpty(ext))
+                    {
+                        ext = ".png";
+                        fileName += ext;
+                    }
+
+                    ImageFormat fmt;
+                    switch (ext)
+                    {
+                        case ".jpg":
+                        case ".jpeg":
+                            fmt = ImageFormat.Jpeg;
+                            break;
+                        case ".bmp":
+                            fmt = ImageFormat.Bmp;
+                            break;
+                        default:
+                            fmt = ImageFormat.Png;
+                            break;
+                    }
+
+                    if (fmt.Equals(ImageFormat.Jpeg))
+                    {
+                        using (var rgb = new Bitmap(canvasBitmap.Width, canvasBitmap.Height, PixelFormat.Format24bppRgb))
+                        {
+                            using (var g = Graphics.FromImage(rgb))
+                            {
+                                g.Clear(Color.White);
+                                g.DrawImage(canvasBitmap, 0, 0);
+                            }
+                            rgb.Save(fileName, fmt);
+                        }
+                    }
+                    else
+                    {
+                        canvasBitmap.Save(fileName, fmt);
+                    }
+
+                    MessageBox.Show("그림이 성공적으로 저장되었습니다!", "저장 성공", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("저장 중 오류가 발생했습니다: " + ex.Message, "저장 실패", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
