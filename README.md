@@ -7,12 +7,16 @@
 - **사용한 플랫폼**: 
     - C#, .NET Windows Forms, Visual Studio, GitHub
 - **사용한 컨트롤**: 
-    - Label, Button, ComboBox, TrackBar, GroupBox, PictureBox
+    - Label, Button, ComboBox, TrackBar, GroupBox, PictureBox, SaveFileDialog, OpenFileDialog
 - **사용한 기술과 구현 기능**:
     - **도형 그리기**: 선, 사각형, 원을 마우스로 그릴 수 있는 기능
     - **색상 선택**: ComboBox를 사용하여 선과 도형의 색상을 선택할 수 있는 기능
     - **선 굵기 조절**: TrackBar를 사용하여 선의 굵기를 조절할 수 있는 기능
     - **그리기 모드 선택**: GroupBox와 RadioButton을 사용하여 선, 사각형, 원 중에서 그리기 모드를 선택할 수 있는 기능
+    - **비트맵 기반 캔버스 시스템**: `Bitmap`과 `Graphics` 클래스를 사용하여 메모리 상의 이미지 데이터와 화면 표시 데이터를 분리하여 관리
+    - **파일 입출력(I/O) 기능**: 
+        - **이미지 저장**: `SaveFileDialog`를 통해 작업한 결과물을 PNG, JPG 등의 이미지 파일로 저장
+        - **외부 이미지 로드**: `OpenFileDialog`를 통해 기존 사진을 불러와 캔버스 배경으로 설정하고 그 위에 추가 작도를 수행하는 기능
 
 
 ## 실행 화면 (과제 1)
@@ -58,13 +62,11 @@
 
 ## 실행 화면 (과제 4)
 
-- 과제 4 코드의 실행 스크린샷 (외부 이미지 로드 및 편집 화면)
+- 과제 4 코드의 실행 스크린샷
 
 ![과제4 실행화면](img/paint4-1.png)
 
 ![과제4 실행화면](img/paint4-2.png)
-
-![과제4 실행화면](img/paint4-3.png)
 
 ![과제4 실행화면](img/paint4-4.png)
 
