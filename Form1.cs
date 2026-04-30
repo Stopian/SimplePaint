@@ -2,6 +2,7 @@ namespace SimplePaint
 {
     using System;
     using System.Drawing;
+    using System.Drawing.Drawing2D;
     using System.Drawing.Imaging;
     using System.Windows.Forms;
     public partial class Form1 : Form
@@ -22,8 +23,10 @@ namespace SimplePaint
             // 캔버스 초기화
             canvasBitmap = new Bitmap(picCanvas.Width, picCanvas.Height);
             canvasGraphics = Graphics.FromImage(canvasBitmap);
+            // 캔버스 그래픽 품질 설정
+            canvasGraphics.SmoothingMode = SmoothingMode.AntiAlias;
+            canvasGraphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
             canvasGraphics.Clear(Color.White); // 캔버스를 흰색으로 초기화
-            picCanvas.Image = canvasBitmap;
             // 마우스 입력과 페인트 이벤트를 코드에서 연결
             picCanvas.MouseDown += picCanvas_MouseDown;
             picCanvas.MouseMove += picCanvas_MouseMove;
@@ -126,11 +129,9 @@ namespace SimplePaint
             isDrawing = false;
             endPoint = e.Location;
 
-            // 비트맵(canvasBitmap)에 실제로 그림을 그림
-            DrawShape(canvasGraphics);
-
+            // 비트맵(canvasBitmap)에 실제로 그림을 그림 (최종은 실선)
+            DrawShape(canvasGraphics, preview: false);
             // PictureBox에 반영
-            picCanvas.Image = canvasBitmap;
             picCanvas.Invalidate();
         }
 
@@ -138,29 +139,49 @@ namespace SimplePaint
         // PictureBox의 Paint 이벤트에 연결되어야 함
         private void picCanvas_Paint(object sender, PaintEventArgs e)
         {
+            // 먼저 현재 캔버스 비트맵을 그립니다.
+            if (canvasBitmap != null)
+            {
+                e.Graphics.DrawImageUnscaled(canvasBitmap, Point.Empty);
+            }
+
             if (isDrawing)
             {
-                // 화면(PictureBox)에만 임시로 가이드라인을 그림
-                DrawShape(e.Graphics);
+                // 화면(PictureBox)에만 임시로 가이드라인을 그림 (미리보기는 점선)
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                DrawShape(e.Graphics, preview: true);
             }
         }
 
         // 공통 그리기 로직 (도형 선택 기능 포함)
-        private void DrawShape(Graphics g)
+        private void DrawShape(Graphics g, bool preview)
         {
-            using (var myPen = new Pen(currentColor, currentLineWidth))
+            // 그래픽 품질
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            using (var myPen = new Pen(currentColor, Math.Max(1, currentLineWidth)))
             {
+                if (preview)
+                {
+                    // 점선을 더 잘 보이게 하기 위해 대시 패턴을 설정
+                    myPen.DashStyle = DashStyle.Dash;
+                    myPen.DashPattern = new float[] { 4f, 4f };
+                }
+                else
+                {
+                    myPen.DashStyle = DashStyle.Solid;
+                }
+
                 switch (currentTool)
                 {
                     case ToolType.Line:
                         g.DrawLine(myPen, startPoint, endPoint);
                         break;
                     case ToolType.Rectangle:
-                        // 사각형의 시작점과 크기를 계산하여 그림
                         g.DrawRectangle(myPen, GetRectangle());
                         break;
                     case ToolType.Circle:
-                        // 사각형 영역 안에 내접하는 원을 그림
                         g.DrawEllipse(myPen, GetRectangle());
                         break;
                 }
